@@ -476,9 +476,9 @@ switch ori
             R= r + (i-(i*rs)); 
         end
     case {'horizontal', 'h'}   % step right for horz series (h)
-        h(1:ng)= h(1):(3*R+1):(3*R+1)*ng-1;       
+        h(1:ng)= h(1):(3*R(1)+1):(3*R(1)+1)*ng-1;       
     case {'vertical', 'v'}     % step down for vert series (k)
-        k(1:ng)= k(1):-(3*R+1):-((3*R+1)*ng-1);   
+        k(1:ng)= k(1):-(3*R(1)+1):-((3*R(1)+1)*ng-1);   
     otherwise
 end
 
@@ -522,8 +522,8 @@ if zpres    % handle case where zeros are present
     [zr, ix]= sort(z_row);
     zc= z_col(ix); 
     for i= 1:length(zr)             % for rows with zeros
-        if sum(data(zr(i), :)) == 1  
-            fill100= true; 
+        if (sum(data(zr(i), :)) == (1 + eps)) & (numel(zr) == size(data, 2)-1)  % 1  
+            % fill100= true; 
 
             if zc(i) > max_nonzero_ix(zr(i))
                 thetas{zr(i), zc(i)-1}(end)= thetas{zr(i), zc(i)-1}(1);
