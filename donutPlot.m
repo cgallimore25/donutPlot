@@ -522,7 +522,9 @@ if zpres    % handle case where zeros are present
     [zr, ix]= sort(z_row);
     zc= z_col(ix); 
     for i= 1:length(zr)             % for rows with zeros
-        if (sum(data(zr(i), :)) == (1 + eps)) & (numel(zr) == size(data, 2)-1)  % 1  
+        data_sums_to_1= sum(data(zr(i), :)) == (1 + eps); 
+        only_1_nz_comp= sum(zr == i) == size(data, 2)-1; 
+        if data_sums_to_1 && only_1_nz_comp  % 1  
             % fill100= true; 
 
             if zc(i) > max_nonzero_ix(zr(i))
