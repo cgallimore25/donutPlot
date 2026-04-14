@@ -329,6 +329,8 @@ else
 end
 axis off; 
 
+H.lgdH=  [];  
+
 % create legend (concentric plots only)
 if def.make_lgd
     H.lgdH= plotRadialLgd(fig, lf, lv, gtxt, lbls_xy); 
