@@ -93,8 +93,6 @@
 
 function H = donutPlot(data, varargin)
 
-fig= gcf; 
-
 % input parser defaults
 def.R=  10;             % outer radius
 def.r=  0.65;           % inner radius as a proportion of outer radius
@@ -139,12 +137,11 @@ res=    p.Results.patchRes;
 pltx=   p.Results.showLabels; 
 gtxt=   p.Results.showLegend; 
 
-% Get handle to either the requested or a new axis, assign to figure handle
+% Derive fig from current ax
 if isempty(ax)
     ax= gca;
 end
-
-fig.CurrentAxes= ax; 
+fig= ax.Parent; 
 
 
 % force vector inputs to be row-wise
@@ -270,6 +267,9 @@ if isscalar(fa)
     fa= repmat(fa, size(data)); 
 end
 
+hold_state= ishold(ax);   % save state before plotting
+hold(ax, 'on');
+
 % plot arcs & percentages
 for n= 1:ng
     % assign color matrix based on rule
@@ -289,7 +289,7 @@ for n= 1:ng
         if perfect_circle   % use polyshape
             arcs(n).series(1, j)= polyshape([x_vtx{n, j} y_vtx{n, j}]);   
             plot(ax, arcs(n).series(1, j), 'FaceColor', colors(j, :), 'FaceAlpha', fa(n, j), ...
-                                       'EdgeColor', ec, 'LineWidth', lw); hold on
+                                       'EdgeColor', ec, 'LineWidth', lw); 
         else                % use patch
             arcs(n).series(1, j)= patch('Faces',    1:length(x_vtx{n, j}), ...
                                         'Vertices', [x_vtx{n, j} y_vtx{n, j}], ...
@@ -297,7 +297,7 @@ for n= 1:ng
                                         'FaceVertexAlphaData', fa(n, j), ...
                                         'FaceAlpha', 'flat', 'FaceColor', 'flat', ...
                                         'EdgeColor', ec, 'LineWidth', lw, ...
-                                        'Parent', ax);   hold on
+                                        'Parent', ax);   
         end
         if pltx             % plot text
             lbls(n).series(1, j)= text(ax, xt(n, j) + h(n), yt(n, j) + k(n), ...
@@ -313,6 +313,10 @@ if pltx
     for n= 1:ng
         uistack(lbls(n).series, 'top')
     end
+end
+
+if ~hold_state
+    hold(ax, 'off');
 end
 
 set(fig, 'color', 'w')
