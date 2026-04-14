@@ -224,7 +224,7 @@ end
 
 
 % handle unlikely cases in the data (e.g. zeros, one component is 100, etc)
-[thetas, perfect_circle]= handleSpecialZeroCases(data, thetas, zpres, zpos, mnz); 
+[thetas, perfect_circle]= handleSpecialZeroCases(data, thetas, ng, zpres, zpos, mnz); 
 
 
 % finally compute the circular arcs
@@ -510,9 +510,9 @@ a0(:, 2:n_cats)= af(:, 1:n_cats-1);
 end
 
 %--------------------------------------------------------------------------
-function [thetas, fill100]= handleSpecialZeroCases(data, thetas, zpres, zpos, max_nonzero_ix)
+function [thetas, fill100]= handleSpecialZeroCases(data, thetas, ngroups, zpres, zpos, max_nonzero_ix)
 
-fill100= false; 
+fill100= repelem(false, ngroups); 
 
 if zpres    % handle case where zeros are present
     [z_row, z_col]= find(zpos);     % index zeros
@@ -521,11 +521,11 @@ if zpres    % handle case where zeros are present
     % else, skip the percentage, producing a partial pie
     [zr, ix]= sort(z_row);
     zc= z_col(ix); 
-    for i= 1:length(zr)             % for rows with zeros
-        data_sums_to_1= sum(data(zr(i), :)) == (1 + eps); 
+    for i= 1:length(zr)             % for zeros in row
+        data_sums_to_1= abs(sum(data(zr(i), :)) - 1) < sqrt(eps);
         only_1_nz_comp= sum(zr == i) == size(data, 2)-1; 
         if data_sums_to_1 && only_1_nz_comp  % 1  
-            % fill100= true; 
+            fill100(zr(i))= true; 
 
             if zc(i) > max_nonzero_ix(zr(i))
                 thetas{zr(i), zc(i)-1}(end)= thetas{zr(i), zc(i)-1}(1);
@@ -590,7 +590,7 @@ txt_rad= (R + r) / 2;
 [th, ar]= deal(cell(1, ng)); 
 
 for n= 1:ng
-    th{n}= linspace(a0(n), af(ng))'; 
+    th{n}= linspace(a0(n), af(n))'; 
     ar{n}= [repmat(r(n), 100, 1), repmat(R(n), 100, 1)];
 end
 
